@@ -1,7 +1,7 @@
 {
     "description": "Neos Project Marketplace / Review Registry",
     "name": "neos/marketplace-reviewregistry",
-    "type": "typo3-flow-package",
+    "type": "neos-package",
     "license": "MIT",
     "require": {
         "typo3/flow": "*",
