@@ -1,0 +1,20 @@
+{
+    "description": "Neos Project Marketplace / Review Registry",
+    "name": "neos/marketplace-reviewregistry",
+    "type": "typo3-flow-package",
+    "license": "MIT",
+    "require": {
+        "typo3/flow": "*",
+        "ramsey/uuid": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Neos\\MarketPlace\\ReviewRegistry\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Neos.MarketPlace.ReviewRegistry"
+        }
+    }
+}
