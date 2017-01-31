@@ -34,11 +34,6 @@ class Subject
     const STAGE_REGISTRATION_REQUESTED = 'neos.marketplace.review.registry.stageregistrationrequested';
 
     /**
-     * Service Discovery Requested
-     */
-    const SERVICE_DISCOVERY_REQUESTED = 'neos.marketplace.review.registry.servicediscoveryrequested';
-
-    /**
      * Stage Pattern
      */
     const STAGE_PATTERN = 'neos.marketplace.review.stage.{name}';

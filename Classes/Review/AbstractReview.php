@@ -69,11 +69,11 @@ abstract class AbstractReview implements ReviewInterface
                 $payload = $message->getPayload();
                 if (!isset($payload['inbox'])) {
                     // Missing inbox handle error
-
+                    return;
                 }
                 if (!isset($payload['package'])) {
                     // Missing package handle error
-
+                    return;
                 }
                 $this->log($payload, ReviewInterface::ACTION_STARTED);
 
@@ -93,14 +93,6 @@ abstract class AbstractReview implements ReviewInterface
         $connection->publish(Subject::STAGE_REGISTRATION_REQUESTED, $message->serialize());
 
         return $this->sid;
-    }
-
-    /**
-     * @param \Nats\Message $response
-     */
-    public function handlePing(\Nats\Message $response)
-    {
-        $response->reply('pong');
     }
 
     /**
@@ -137,6 +129,14 @@ abstract class AbstractReview implements ReviewInterface
     }
 
     /**
+     * @param \Nats\Message $response
+     */
+    protected function handlePing(\Nats\Message $response)
+    {
+        $response->reply('pong');
+    }
+
+    /**
      * Unsubscribe to the active SIDs
      */
     public function __destruct()
@@ -144,6 +144,4 @@ abstract class AbstractReview implements ReviewInterface
         $this->connection->unsubscribe($this->sid);
         $this->connection->unsubscribe($this->pingSid);
     }
-
-
 }

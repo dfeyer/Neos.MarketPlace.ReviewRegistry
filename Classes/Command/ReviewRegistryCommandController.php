@@ -85,11 +85,7 @@ class ReviewRegistryCommandController extends CommandController
             $package = $payload['package'];
             $this->outputLine(sprintf('<info>++</info> action=review_start package=%s', $package));
 
-            $inbox = '_INBOX.PACKAGE.' . Uuid::uuid4()->toString();
-            $this->outputLine(sprintf('<comment>++</comment> action=create_inbox package=%s inbox=%s', $package, $inbox));
-            $connection->subscribe($inbox, function ($response) {
-                $this->outputLine(sprintf('<comment>!!</comment> %s', $response));
-            });
+            $inbox = $this->createAndSubscribeToReviewInbox($package, $connection);
 
             foreach ($this->reviewStageService->all() as $stage) {
                 $connection->request($stage . '.ping', null, function (\Nats\Message $response) use ($stage, $connection, $package, $inbox) {
@@ -106,6 +102,31 @@ class ReviewRegistryCommandController extends CommandController
                 });
             }
         });
+    }
+
+    /**
+     * Create and subscribe to an INBOX for the current review
+     *
+     * This create a uniq INBOX for each review. This INBOX can be used to distribute event relative to
+     * the current review. When the review is finished (action=review_stage_finised), the connection unsubscribe
+     * automatically.
+     *
+     * @param string $package
+     * @param Connection $connection
+     * @return string
+     */
+    protected function createAndSubscribeToReviewInbox($package, Connection $connection)
+    {
+        $inbox = '_INBOX.PACKAGE.' . Uuid::uuid4()->toString();
+        $this->outputLine(sprintf('<comment>++</comment> action=create_inbox package=%s inbox=%s', $package, $inbox));
+        $connection->subscribe($inbox, function (\Nats\Message $response) use ($connection) {
+            $message = $response->getBody();
+            $this->outputLine(sprintf('<comment>!!</comment> %s', $message));
+            if (strpos($message, 'action=review_stage_finised') === 0) {
+                $connection->unsubscribe($response->getSid());
+            }
+        });
+        return $inbox;
     }
 
     /**
@@ -139,8 +160,5 @@ class ReviewRegistryCommandController extends CommandController
                     break;
             }
         });
-
-        // Review step discovery
-        $connection->publish(Subject::SERVICE_DISCOVERY_REQUESTED);
     }
 }

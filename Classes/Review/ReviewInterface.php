@@ -35,11 +35,6 @@ interface ReviewInterface
     /**
      * @param Message $response
      */
-    public function handlePing(Message $response);
-
-    /**
-     * @param Message $response
-     */
     public function handleReview(Message $response);
 
     /**
